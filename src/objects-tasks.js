@@ -33,8 +33,14 @@ function shallowCopy(obj) {
  *    mergeObjects([{a: 1, b: 2}, {b: 3, c: 5}]) => {a: 1, b: 5, c: 5}
  *    mergeObjects([]) => {}
  */
-function mergeObjects(/* objects */) {
-  throw new Error('Not implemented');
+function mergeObjects(objects) {
+  return objects.reduce((acc, obj) => {
+    const resultObj = { ...acc };
+    Object.entries(obj).forEach(([key, value]) => {
+      resultObj[key] = (resultObj[key] || 0) + value;
+    });
+    return resultObj;
+  }, {});
 }
 
 /**
@@ -51,13 +57,13 @@ function mergeObjects(/* objects */) {
  *
  */
 function removeProperties(obj, keys) {
-  const newObj = { ...obj };
+  const resultObj = { ...obj };
 
   keys.forEach((key) => {
-    delete newObj[key];
+    delete resultObj[key];
   });
 
-  return newObj;
+  return resultObj;
 }
 
 /**
@@ -107,8 +113,8 @@ function isEmptyObject(obj) {
  *    immutableObj.newProp = 'new';
  *    console.log(immutableObj) => {a: 1, b: 2}
  */
-function makeImmutable(/* obj */) {
-  throw new Error('Not implemented');
+function makeImmutable(obj) {
+  return Object.freeze({ ...obj });
 }
 
 /**
@@ -121,8 +127,16 @@ function makeImmutable(/* obj */) {
  *    makeWord({ a: [0, 1], b: [2, 3], c: [4, 5] }) => 'aabbcc'
  *    makeWord({ H:[0], e: [1], l: [2, 3, 8], o: [4, 6], W:[5], r:[7], d:[9]}) => 'HelloWorld'
  */
-function makeWord(/* lettersObject */) {
-  throw new Error('Not implemented');
+function makeWord(lettersObject) {
+  const resultArray = [];
+
+  Object.entries(lettersObject).forEach(([key, positions]) => {
+    positions.forEach((pos) => {
+      resultArray[pos] = key;
+    });
+  });
+
+  return resultArray.join('');
 }
 
 /**
