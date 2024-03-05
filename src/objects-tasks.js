@@ -303,39 +303,38 @@ function group(/* array, keySelector, valueSelector */) {
 class CSSSelectorBuilder {
   constructor() {
     this.css = '';
-    this.arrayOfNames = [];
-    this.orderNumber = 0;
+    this.parts = [];
+    this.order = 0;
   }
 
   check(newOrder) {
-    if (newOrder < this.orderNumber) {
+    if (newOrder < this.order) {
       throw new Error(
         'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
       );
     }
-    this.orderNumber = newOrder;
+    this.order = newOrder;
   }
 
-  element(value) {
-    this.check(0);
-    if (this.arrayOfNames.includes('element')) {
+  checkUnique(part) {
+    if (this.parts.includes(part)) {
       throw new Error(
         'Element, id and pseudo-element should not occur more then one time inside the selector'
       );
     }
-    this.arrayOfNames.push('element');
+    this.parts.push(part);
+  }
+
+  element(value) {
+    this.check(0);
+    this.checkUnique('element');
     this.css += value;
     return this;
   }
 
   id(value) {
     this.check(1);
-    if (this.arrayOfNames.includes('id')) {
-      throw new Error(
-        'Element, id and pseudo-element should not occur more then one time inside the selector'
-      );
-    }
-    this.arrayOfNames.push('id');
+    this.checkUnique('id');
     this.css += `#${value}`;
     return this;
   }
@@ -360,12 +359,7 @@ class CSSSelectorBuilder {
 
   pseudoElement(value) {
     this.check(5);
-    if (this.arrayOfNames.includes('pseudo-element')) {
-      throw new Error(
-        'Element, id and pseudo-element should not occur more then one time inside the selector'
-      );
-    }
-    this.arrayOfNames.push('pseudo-element');
+    this.checkUnique('pseudo-element');
     this.css += `::${value}`;
     return this;
   }
@@ -381,47 +375,14 @@ class CSSSelectorBuilder {
 }
 
 const cssSelectorBuilder = {
-  element(value) {
-    const returnValuer = new CSSSelectorBuilder();
-    returnValuer.element(value);
-    return returnValuer;
-  },
-
-  id(value) {
-    const returnValuer = new CSSSelectorBuilder();
-    returnValuer.id(value);
-    return returnValuer;
-  },
-
-  class(value) {
-    const returnValuer = new CSSSelectorBuilder();
-    returnValuer.class(value);
-    return returnValuer;
-  },
-
-  attr(value) {
-    const returnValuer = new CSSSelectorBuilder();
-    returnValuer.attr(value);
-    return returnValuer;
-  },
-
-  pseudoClass(value) {
-    const returnValuer = new CSSSelectorBuilder();
-    returnValuer.pseudoClass(value);
-    return returnValuer;
-  },
-
-  pseudoElement(value) {
-    const returnValuer = new CSSSelectorBuilder();
-    returnValuer.pseudoElement(value);
-    return returnValuer;
-  },
-
-  combine(selector1, combinator, selector2) {
-    const returnValuer = new CSSSelectorBuilder();
-    returnValuer.combine(selector1, combinator, selector2);
-    return returnValuer;
-  },
+  element: (value) => new CSSSelectorBuilder().element(value),
+  id: (value) => new CSSSelectorBuilder().id(value),
+  class: (value) => new CSSSelectorBuilder().class(value),
+  attr: (value) => new CSSSelectorBuilder().attr(value),
+  pseudoClass: (value) => new CSSSelectorBuilder().pseudoClass(value),
+  pseudoElement: (value) => new CSSSelectorBuilder().pseudoElement(value),
+  combine: (selector1, combinator, selector2) =>
+    new CSSSelectorBuilder().combine(selector1, combinator, selector2),
 };
 
 module.exports = {
