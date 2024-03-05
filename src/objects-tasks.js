@@ -178,11 +178,7 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-// function fromJSON(proto, json) {
-//   const obj = Object.create(proto);
-//   Object.assign(obj, JSON.parse(json));
-//   return obj;
-// }
+
 const fromJSON = (proto, json) =>
   Object.assign(Object.create(proto), JSON.parse(json));
 
